@@ -31,4 +31,10 @@ class CategoriaVeiculoController {
         return $this->categoriaVeiculoServico->editarCategoriaVeiculo();
     }
 
+    // buscar categoria do veiculo pelo id
+    public function buscarCategoriaVeiculoPeloId() {
+
+        return $this->categoriaVeiculoServico->buscarCategoriaVeiculoPeloId();
+    }
+
 }

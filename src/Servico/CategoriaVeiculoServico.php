@@ -111,4 +111,32 @@ class CategoriaVeiculoServico extends ServicoBase {
 
     }
 
+    // buscar categoria veiculo pelo id
+    public function buscarCategoriaVeiculoPeloId() {
+
+        try {
+
+            if (!isset($_GET["categoria_veiculo_id"])) {
+                Resposta::response(false, "Informe o id da categoria do veiculo no cabeçalho da requisição.");
+            }
+
+            if (empty($_GET["categoria_veiculo_id"])) {
+                Resposta::response(false, "Informe o id da categoria do veiculo.");
+            }
+
+            $categoriaVeiculoId = $_GET["categoria_veiculo_id"];
+
+            $categoria = $this->categoriaVeiculoRepositorio->buscarPeloId($categoriaVeiculoId);
+
+            if (empty($categoria)) {
+                Resposta::response(false, "Categoria de veiculo não encontrado.");
+            }
+
+            Resposta::response(true, "Categoria de veiculo encontrado com sucesso.", $categoria);
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se buscar a categoria do veiculo pelo id.");
+        }
+
+    }
+
 }
