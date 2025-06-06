@@ -19,4 +19,16 @@ class ProprietarioController {
         return $this->proprietarioServico->cadastrarProprietario();
     }
 
+    // buscar todos os proprietários
+    public function buscarProprietarios() {
+
+        return $this->proprietarioServico->buscarProprietarios();
+    }
+
+    // buscar proprietário pelo cpf
+    public function buscarProprietarioPeloCpf() {
+
+        return $this->proprietarioServico->buscarProprietarioPeloCpf();
+    }
+
 }

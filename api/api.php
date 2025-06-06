@@ -38,6 +38,16 @@ try {
         $rota->post("/proprietarios/cadastrar", ProprietarioController::class, "cadastrarProprietario");
     }
 
+    // buscar proprietários
+    if ($endpoint === "/proprietarios") {
+        $rota->get("/proprietarios", ProprietarioController::class, "buscarProprietarios");
+    }
+
+    // buscar proprietário pelo cpf
+    if ($endpoint === "/proprietarios/buscar-pelo-cpf") {
+        $rota->get("/proprietarios/buscar-pelo-cpf", ProprietarioController::class, "buscarProprietarioPeloCpf");
+    }
+
     Resposta::response(false, "404 - Rota inválida.");
 } catch (Exception $e) {
     echo "Erro: " . $e->getMessage() . "<br>";

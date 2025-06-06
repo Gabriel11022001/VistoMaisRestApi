@@ -28,4 +28,6 @@ interface IProprietarioRepositorio {
 
     function buscarPeloRg($rgProprietario);
 
+    function buscarProprietarios($paginaAtual, $elementosPorPagina);
+
 }

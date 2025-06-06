@@ -15,6 +15,53 @@ class ProprietarioRepositorio extends Repositorio implements IProprietarioReposi
         parent::__construct($conexaoBancoDados);
     }
 
+    // buscar proprietários no banco de dados
+    public function buscarProprietarios($paginaAtual, $elementosPorPagina) {
+        $stmt = $this->bancoDados->prepare("SELECT p.*, e.cep, e.endereco_id, e.complemento, e.bairro, e.logradouro,
+        e.estado, e.cidade, e.numero
+        FROM tb_proprietarios AS p
+        INNER JOIN tb_enderecos AS e
+        ON p.proprietario_id = e.proprietario_id
+        ORDER BY p.nome_completo ASC");
+
+        $stmt->execute();
+        $proprietariosArray = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $proprietarios = array();
+
+        foreach ($proprietariosArray as $proprietarioArray) {
+            $proprietario = new Proprietario();
+            $endereco = new Endereco();
+
+            $proprietario->proprietarioId = $proprietarioArray["proprietario_id"];
+            $proprietario->nomeCompleto = $proprietarioArray["nome_completo"];
+            $proprietario->telefone = $proprietarioArray["telefone"];
+            $proprietario->email = $proprietarioArray["email"];
+            $proprietario->dataNascimento = new DateTime($proprietarioArray["data_nascimento"]);
+            $proprietario->rg = $proprietarioArray["rg"];
+            $proprietario->cpf = $proprietarioArray["cpf"];
+            $proprietario->numeroCnh = $proprietarioArray["numero_cnh"];
+            $proprietario->fotoProprietario = $proprietarioArray["foto_proprietario"];
+            $proprietario->fotoFrenteDocumento = $proprietarioArray["foto_frente_documento"];
+            $proprietario->fotoVersoDocumento = $proprietarioArray["foto_verso_documento"];
+            $proprietario->fotoComprovanteResidencia = $proprietarioArray["foto_comprovante_residencia"];
+
+            $endereco->enderecoId = $proprietarioArray["endereco_id"];
+            $endereco->cep = $proprietarioArray["cep"];
+            $endereco->complemento = $proprietarioArray["complemento"];
+            $endereco->logradouro = $proprietarioArray["logradouro"];
+            $endereco->bairro = $proprietarioArray["bairro"];
+            $endereco->cidade = $proprietarioArray["cidade"];
+            $endereco->numero = $proprietarioArray["numero"];
+            $endereco->estado = $proprietarioArray["estado"];
+
+            $proprietario->endereco = $endereco;
+
+            $proprietarios[] = $proprietario;
+        }
+
+        return $proprietarios;
+    }
+
     // cadastrar proprietário na base de dados
     public function cadastrar($proprietarioCadastrar) {
         $stmt = $this->bancoDados->prepare("INSERT INTO tb_proprietarios(nome_completo, telefone, email, cpf, rg,

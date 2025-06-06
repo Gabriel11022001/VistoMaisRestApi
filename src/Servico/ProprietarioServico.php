@@ -112,4 +112,63 @@ class ProprietarioServico extends ServicoBase {
 
     }
 
+    // buscar proprietarios
+    public function buscarProprietarios() {
+
+        try {
+            
+            if (!isset($_GET["pagina_atual"]) || !isset($_GET["elementos_por_pagina"])) {
+                Resposta::response(false, "Informe a pagina atual e a quantidade de elementos por página na url.");
+            }
+
+            $paginaAtual = 1;
+            $elementosPorPagina = 5;
+
+            if (!empty($_GET["pagina_atual"]) && $_GET["pagina_atual"] > 1) {
+                $paginaAtual = $_GET["pagina_atual"];
+            }
+
+            if (!empty($_GET["elementos_por_pagina"]) && $_GET["elementos_por_pagina"] >= 5 && $_GET["elementos_por_pagina"] <= 10) {
+                $elementosPorPagina = $_GET["elementos_por_pagina"];
+            }
+
+            $proprietarios = $this->proprietarioRepositorio->buscarProprietarios($paginaAtual, $elementosPorPagina);
+
+            if (count($proprietarios) > 0) {
+                Resposta::response(true, "Proprietários listados com sucesso.", $proprietarios);
+            } else {
+                Resposta::response(true, "Não existem proprietários cadastrados na base de dados.", array());
+            }
+
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se consultar os proprietários.", $e->getMessage());
+        }
+
+    }
+
+    // buscar proprietário pelo cpf
+    public function buscarProprietarioPeloCpf() {
+
+        try {
+            $cpf = getParametro("cpf");
+
+            if (empty($cpf)) {
+                Resposta::response(false, "Informe o cpf do proprietário.");
+            }
+
+            // validar o cpf informado
+
+            $proprietario = $this->proprietarioRepositorio->buscarPeloCpf($cpf);
+
+            if (empty($proprietario)) {
+                Resposta::response(false, "Não existe um proprietáiro cadastrado com o cpf informado na base de dados.");
+            }
+
+            Resposta::response(true, "Proprietáiro encontrado com sucesso.", $proprietario);
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se consultar o proprietário pelo cpf.");
+        }
+
+    }
+
 }
