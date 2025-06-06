@@ -154,8 +154,48 @@ class ProprietarioRepositorio extends Repositorio implements IProprietarioReposi
         
     }
 
+    // buscar proprietário pelo id
     public function buscarPeloId($idProprietarioConsultar) {
+        $stmt = $this->bancoDados->prepare("SELECT p.*, e.endereco_id, e.cep, e.logradouro, e.complemento,
+        e.cidade, e.bairro, e.estado, e.numero
+        FROM tb_proprietarios AS p
+        INNER JOIN tb_enderecos AS e
+        ON p.proprietario_id = e.proprietario_id
+        AND p.proprietario_id = :proprietario_id");
 
+        $stmt->bindValue(":proprietario_id", $idProprietarioConsultar);
+        $stmt->execute();
+        $proprietarioObj = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if (empty($proprietarioObj)) {
+
+            return null;
+        }
+
+        $proprietario = new Proprietario();
+        $endereco = new Endereco();
+
+        $proprietario->proprietarioId = $proprietarioObj->proprietario_id;
+        $proprietario->nomeCompleto = $proprietarioObj->nome_completo;
+        $proprietario->telefone = $proprietarioObj->telefone;
+        $proprietario->cpf = $proprietarioObj->cpf;
+        $proprietario->rg = $proprietarioObj->rg;
+        $proprietario->email = $proprietarioObj->email;
+        $proprietario->dataNascimento = new DateTime($proprietarioObj->data_nascimento);
+        $proprietario->numeroCnh = $proprietarioObj->numero_cnh;
+        
+        $endereco->enderecoId = $proprietarioObj->endereco_id;
+        $endereco->cep = $proprietarioObj->cep;
+        $endereco->complemento = $proprietarioObj->complemento;
+        $endereco->logradouro = $proprietarioObj->logradouro;
+        $endereco->cidade = $proprietarioObj->cidade;
+        $endereco->bairro = $proprietarioObj->bairro;
+        $endereco->numero = $proprietarioObj->numero;
+        $endereco->estado = $proprietarioObj->estado;
+
+        $proprietario->endereco = $endereco;
+
+        return $proprietario;
     }
 
     // cadastrar endereço do proprietário

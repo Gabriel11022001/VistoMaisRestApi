@@ -31,4 +31,10 @@ class ProprietarioController {
         return $this->proprietarioServico->buscarProprietarioPeloCpf();
     }
 
+    // buscar proprietário pelo id
+    public function buscarProprietarioPeloId() {
+
+        return $this->proprietarioServico->buscarProprietarioPeloId();
+    }
+
 }

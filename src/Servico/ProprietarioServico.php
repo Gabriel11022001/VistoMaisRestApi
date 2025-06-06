@@ -9,6 +9,7 @@ use Models\Proprietario;
 use Repositorio\ProprietarioRepositorio;
 use Utils\Resposta;
 use Validators\ValidaCamposCadastroProprietario;
+use Validators\ValidaCpf;
 
 class ProprietarioServico extends ServicoBase {
 
@@ -157,6 +158,9 @@ class ProprietarioServico extends ServicoBase {
             }
 
             // validar o cpf informado
+            if (!ValidaCpf::validar($cpf)) {
+                Resposta::response(false, "Informe um cpf válido.");
+            }
 
             $proprietario = $this->proprietarioRepositorio->buscarPeloCpf($cpf);
 
@@ -167,6 +171,34 @@ class ProprietarioServico extends ServicoBase {
             Resposta::response(true, "Proprietáiro encontrado com sucesso.", $proprietario);
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se consultar o proprietário pelo cpf.");
+        }
+
+    }
+
+    // buscar proprietário pelo id
+    public function buscarProprietarioPeloId() {
+
+        try {
+            
+            if (!isset($_GET["proprietario_id"])) {
+                Resposta::response(false, "Informe o id do proprietário na url.");
+            }
+
+            $id = $_GET["proprietario_id"];
+
+            if (empty($id)) {
+                Resposta::response(false, "Informe o id do proprietário.");
+            }
+
+            $proprietario = $this->proprietarioRepositorio->buscarPeloId($id);
+
+            if ($proprietario) {
+                Resposta::response(true, "Proprietário encontrado com sucesso.", $proprietario);
+            }
+
+            Resposta::response(false, "Não existe um proprietário cadastrado na base de dados com o id informado.");
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se buscar o proprietario pelo id.");
         }
 
     }

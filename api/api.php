@@ -48,6 +48,11 @@ try {
         $rota->get("/proprietarios/buscar-pelo-cpf", ProprietarioController::class, "buscarProprietarioPeloCpf");
     }
 
+    // buscar proprietário pelo id
+    if ($endpoint === "/proprietarios/buscar-pelo-id") {
+        $rota->get("/proprietarios/buscar-pelo-id", ProprietarioController::class, "buscarProprietarioPeloId");
+    }
+
     Resposta::response(false, "404 - Rota inválida.");
 } catch (Exception $e) {
     echo "Erro: " . $e->getMessage() . "<br>";
