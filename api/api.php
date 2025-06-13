@@ -3,6 +3,7 @@
 use Controllers\CategoriaVeiculoController;
 use Controllers\ProprietarioController;
 use Controllers\Rota;
+use Controllers\VeiculoController;
 use Utils\Resposta;
 
 require_once "autoload.php";
@@ -51,6 +52,16 @@ try {
     // buscar proprietário pelo id
     if ($endpoint === "/proprietarios/buscar-pelo-id") {
         $rota->get("/proprietarios/buscar-pelo-id", ProprietarioController::class, "buscarProprietarioPeloId");
+    }
+
+    // cadastrar veiculo na base de dados
+    if ($endpoint === "/veiculos/cadastrar") {
+        $rota->post("/veiculos/cadastrar", VeiculoController::class, "cadastrarVeiculo");
+    }
+
+    // buscar veiculos de forma paginada
+    if ($endpoint === "/veiculos") {
+        $rota->get("/veiculos", VeiculoController::class, "buscarVeiculos");
     }
 
     Resposta::response(false, "404 - Rota inválida.");
