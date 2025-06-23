@@ -59,3 +59,46 @@ create table if not exists tb_fotos_veiculos(
 	veiculo_id integer not null,
 	foreign key(veiculo_id) references tb_veiculos(veiculo_id)
 );
+
+-- criar tabela de vistorias veiculares
+create table tb_vistorias_veiculares(
+	vistoria_veicular_id serial primary key,
+	status text,
+	data_realizacao date,
+	veiculo_id integer,
+	nome_vistoriador text,
+	pneus_nao_estao_desgastados boolean,
+	pressao_pneus_correto boolean,
+	farois_perfeito_funcionamento boolean,
+	motor_perfeito_funcionamento boolean,
+	cinto_seguranca_perfeito_funcionamento boolean,
+	possui_triangulo_sinalizacao boolean,
+	extintor_incendio_esta_data_validade boolean,
+	extintor_incendio_perfeito_funcionamento boolean,
+	observacoes text,
+	recomendacoes text,
+	classificacao_geral_veiculo text,
+	foreign key(veiculo_id) references tb_veiculos(veiculo_id)
+);
+
+alter table tb_vistorias_veiculares add column setas_perfeito_funcionamento boolean;
+alter table tb_vistorias_veiculares add column lanternas_perfeito_funcionamento boolean;
+alter table tb_vistorias_veiculares add column sistema_freios_perfeito_funcionamento boolean;
+
+-- criar tabela de usuários
+create table tb_usuarios(
+	usuario_id serial primary key,
+	nome_completo text not null,
+	login text not null,
+	senha text not null
+);
+
+-- criar tabela de tokens de autenticacao
+create table tb_tokens(
+	token_id serial primary key,
+	token text not null,
+	data_cadastro text not null,
+	data_limite text not null,
+	usuario_id integer not null,
+	foreign key(usuario_id) references tb_usuarios(usuario_id)
+);

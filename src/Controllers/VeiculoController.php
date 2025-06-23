@@ -25,4 +25,10 @@ class VeiculoController {
         return $this->veiculoServico->buscarVeiculos();
     }
 
+    // buscar veiculo pelo id
+    public function buscarVeiculoPeloId() {
+
+        return $this->veiculoServico->buscarVeiculoPeloId();
+    }
+
 }

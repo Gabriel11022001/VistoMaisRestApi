@@ -2,6 +2,7 @@
 
 namespace Repositorio;
 
+use DateTime;
 use Exception;
 use Models\CategoriaVeiculo;
 use Models\FotoVeiculo;
@@ -104,6 +105,7 @@ class VeiculoRepositorio extends Repositorio implements IVeiculoRepositorio {
         $proprietario = new Proprietario();
         $proprietario->proprietarioId = $veiculoObj->proprietario_id;
         $proprietario->nomeCompleto = $veiculoObj->nome_completo;
+        $veiculo->proprietario = $proprietario;
 
         return $veiculo;
     }
@@ -116,8 +118,61 @@ class VeiculoRepositorio extends Repositorio implements IVeiculoRepositorio {
         
     }
 
+    // buscar veiculo pelo id
     public function buscarPeloId($idVeiculo) {
-        
+        $stmt = $this->bancoDados->prepare("SELECT tb_veiculos.veiculo_id, tb_veiculos.marca, tb_veiculos.modelo,
+        tb_veiculos.renavam, tb_veiculos.numero_chassi, tb_veiculos.placa, tb_veiculos.ano_fabricacao,
+        tb_veiculos.ano_modelo, tb_veiculos.cor, tb_veiculos.tipo_combustivel, tb_categorias_veiculos.categoria_veiculo_id AS id_categoria_do_veiculo,
+        tb_categorias_veiculos.nome_categoria, tb_proprietarios.proprietario_id AS id_proprietario_do_veiculo, tb_proprietarios.nome_completo,
+        tb_proprietarios.cpf, tb_proprietarios.rg, tb_proprietarios.telefone, tb_proprietarios.email,
+        tb_proprietarios.data_nascimento, tb_proprietarios.numero_cnh
+        FROM tb_veiculos, tb_proprietarios, tb_categorias_veiculos
+        WHERE tb_veiculos.categoria_veiculo_id = tb_categorias_veiculos.categoria_veiculo_id
+        AND tb_veiculos.proprietario_id = tb_proprietarios.proprietario_id
+        AND tb_veiculos.veiculo_id = :veiculo_id");
+
+        $stmt->bindValue(":veiculo_id", $idVeiculo);
+        $stmt->execute();
+        $veiculoObj = $stmt->fetchObject();
+
+        if (empty($veiculoObj)) {
+
+            return null;
+        }
+
+        $veiculo = new Veiculo();
+        $veiculo->veiculoId = $veiculoObj->veiculo_id;
+        $veiculo->marca = $veiculoObj->marca;
+        $veiculo->modelo = $veiculoObj->modelo;
+        $veiculo->renavam = $veiculoObj->renavam;
+        $veiculo->placa = $veiculoObj->placa;
+        $veiculo->numeroChassi = $veiculoObj->numero_chassi;
+        $veiculo->anoFabricacao = $veiculoObj->ano_fabricacao;
+        $veiculo->anoModelo = $veiculoObj->ano_modelo;
+        $veiculo->cor = $veiculoObj->cor;
+        $veiculo->tipoCombustivel = $veiculoObj->tipo_combustivel;
+        $veiculo->categoriaVeiculoId = $veiculoObj->id_categoria_do_veiculo;
+        $veiculo->proprietarioId = $veiculoObj->id_proprietario_do_veiculo;
+
+        $categoriaVeiculo = new CategoriaVeiculo();
+        $categoriaVeiculo->categoriaId = $veiculoObj->id_categoria_do_veiculo;
+        $categoriaVeiculo->nomeCategoria = $veiculoObj->nome_categoria;
+
+        $veiculo->categoriaVeiculo = $categoriaVeiculo;
+
+        $proprietarioVeiculo = new Proprietario();
+        $proprietarioVeiculo->proprietarioId = $veiculoObj->id_proprietario_do_veiculo;
+        $proprietarioVeiculo->nomeCompleto = $veiculoObj->nome_completo;
+        $proprietarioVeiculo->cpf = $veiculoObj->cpf;
+        $proprietarioVeiculo->rg = $veiculoObj->rg;
+        $proprietarioVeiculo->telefone = $veiculoObj->telefone;
+        $proprietarioVeiculo->email = $veiculoObj->email;
+        $proprietarioVeiculo->dataNascimento = new DateTime($veiculoObj->data_nascimento);
+        $proprietarioVeiculo->numeroCnh = $veiculoObj->numero_cnh;
+
+        $veiculo->proprietario = $proprietarioVeiculo;
+
+        return $veiculo;
     }
 
     // buscar todos os veiculos
@@ -192,6 +247,10 @@ class VeiculoRepositorio extends Repositorio implements IVeiculoRepositorio {
 
     public function deletarFotoVeiculo($fotoVeiculoIdDeletar) {
         
+    }
+
+    private function buscarFotosVeiculo() {
+
     }
 
 }

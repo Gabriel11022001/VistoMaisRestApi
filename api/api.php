@@ -3,7 +3,9 @@
 use Controllers\CategoriaVeiculoController;
 use Controllers\ProprietarioController;
 use Controllers\Rota;
+use Controllers\UsuarioController;
 use Controllers\VeiculoController;
+use Controllers\VistoriaVeicularController;
 use Utils\Resposta;
 
 require_once "autoload.php";
@@ -62,6 +64,26 @@ try {
     // buscar veiculos de forma paginada
     if ($endpoint === "/veiculos") {
         $rota->get("/veiculos", VeiculoController::class, "buscarVeiculos");
+    }
+
+    // buscar veiculo pelo id
+    if ($endpoint === "/veiculos/buscar-pelo-id") {
+        $rota->get("/veiculos/buscar-pelo-id", VeiculoController::class, "buscarVeiculoPeloId");
+    }
+
+    // realizar vistoria veicular
+    if ($endpoint === "/vistorias/veicular/cadastrar") {
+        $rota->post("/vistorias/veicular/cadastrar", VistoriaVeicularController::class, "cadastrarVistoriaVeicular");
+    }
+
+    // buscar vistoria veicular pelo id
+    if ($endpoint === "/vistorias/veicular/buscar-pelo-id") {
+        $rota->get("/vistorias/veicular/buscar-pelo-id", VistoriaVeicularController::class, "buscarVistoriaVeicularPeloId");
+    }
+
+    // cadastrar usuário
+    if ($endpoint === "/usuarios/cadastrar") {
+        $rota->post("/usuarios/cadastrar", UsuarioController::class, "cadastrarUsuario");
     }
 
     Resposta::response(false, "404 - Rota inválida.");

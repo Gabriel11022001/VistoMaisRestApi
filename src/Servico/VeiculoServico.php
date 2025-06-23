@@ -137,4 +137,32 @@ class VeiculoServico extends ServicoBase {
 
     }
 
+    // buscar veiculo pelo id
+    public function buscarVeiculoPeloId() {
+
+       try {
+        
+            if (!isset($_GET["veiculo_id"])) {
+                Resposta::response(false, "Informe o id do veiculo na url.");
+            }
+
+            $veiculoId = $_GET["veiculo_id"];
+
+            if (empty($veiculoId)) {
+                Resposta::response(false, "Informe o id do veiculo na url.");
+            }
+
+            $veiculo = $this->veiculoRepositorio->buscarPeloId($veiculoId);
+
+            if (empty($veiculo)) {
+                Resposta::response(false, "Veiculo não encontrado na base de dados.");
+            }
+
+            Resposta::response(true, "Veiculo encontrado com sucesso.", $veiculo);
+       } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se buscar o veiculo pelo id.");
+       }
+
+    }
+
 }
