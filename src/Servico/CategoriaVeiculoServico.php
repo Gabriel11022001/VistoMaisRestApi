@@ -6,15 +6,18 @@ use Exception;
 use Models\CategoriaVeiculo;
 use Repositorio\CategoriaVeiculoRepositorio;
 use Utils\Resposta;
+use Utils\TokenInvalidoException;
 
 class CategoriaVeiculoServico extends ServicoBase {
 
     private $categoriaVeiculoRepositorio;
+    private $authServico;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->authServico = new AuthServico();
         $this->categoriaVeiculoRepositorio = new CategoriaVeiculoRepositorio($this->bancoDados);
     }
 
@@ -22,6 +25,8 @@ class CategoriaVeiculoServico extends ServicoBase {
     public function cadastrarCategoriaVeiculo() {
 
         try {
+            $this->authServico->validar();
+
             $nomeCategoria = getParametro("nome_categoria");
 
             if (empty($nomeCategoria)) {
@@ -43,6 +48,8 @@ class CategoriaVeiculoServico extends ServicoBase {
             $this->categoriaVeiculoRepositorio->cadastrar($categoriaCadastrar);
 
             Resposta::response(true, "Categoria cadastrada com sucesso.", $categoriaCadastrar);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se cadastrar a categoria de veículo.");
         }
@@ -53,6 +60,8 @@ class CategoriaVeiculoServico extends ServicoBase {
     public function listarCategoriasVeiculos() {
 
         try {
+            $this->authServico->validar();
+
             $categorias = $this->categoriaVeiculoRepositorio->listarTodos();
 
             if (count($categorias) == 0) {
@@ -60,6 +69,8 @@ class CategoriaVeiculoServico extends ServicoBase {
             }
 
             Resposta::response(true, "Categorias listadas com sucesso.", $categorias);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se listar as categorias dos veiculos.");
         }
@@ -70,6 +81,8 @@ class CategoriaVeiculoServico extends ServicoBase {
     public function editarCategoriaVeiculo() {
 
         try {
+            $this->authServico->validar();
+
             $categoriaId = getParametro("categoria_id");
             $categoriaNome = getParametro("categoria_nome");
             $errosCampos = [];
@@ -105,6 +118,8 @@ class CategoriaVeiculoServico extends ServicoBase {
             $this->categoriaVeiculoRepositorio->editar($categoriaEditar);
 
             Resposta::response(true, "Categoria editada com sucesso.", $categoriaEditar);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se editar a categoria.");
         }
@@ -115,6 +130,7 @@ class CategoriaVeiculoServico extends ServicoBase {
     public function buscarCategoriaVeiculoPeloId() {
 
         try {
+            $this->authServico->validar();
 
             if (!isset($_GET["categoria_veiculo_id"])) {
                 Resposta::response(false, "Informe o id da categoria do veiculo no cabeçalho da requisição.");
@@ -133,6 +149,8 @@ class CategoriaVeiculoServico extends ServicoBase {
             }
 
             Resposta::response(true, "Categoria de veiculo encontrado com sucesso.", $categoria);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se buscar a categoria do veiculo pelo id.");
         }

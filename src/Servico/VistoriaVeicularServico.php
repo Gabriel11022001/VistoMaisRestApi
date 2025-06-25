@@ -8,6 +8,7 @@ use Models\VistoriaVeicular;
 use Repositorio\VeiculoRepositorio;
 use Repositorio\VistoriaVeicularRepositorio;
 use Utils\Resposta;
+use Utils\TokenInvalidoException;
 
 class VistoriaVeicularServico extends ServicoBase {
     
@@ -18,6 +19,7 @@ class VistoriaVeicularServico extends ServicoBase {
         "media" => 50,
         "ruim" => 0
     ];
+    private $authServico;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class VistoriaVeicularServico extends ServicoBase {
 
         $this->vistoriaVeicularRepositorio = new VistoriaVeicularRepositorio($this->bancoDados);
         $this->veiculoRepositorio = new VeiculoRepositorio($this->bancoDados);
+        $this->authServico = new AuthServico();
     }
 
     // validar campos no cadastro de vistoria veicular
@@ -48,6 +51,8 @@ class VistoriaVeicularServico extends ServicoBase {
     public function cadastrarVistoriaVeicular() {
 
         try {
+            $this->authServico->validar();
+
             $veiculoId = getParametro("veiculo_id");
             $nomeVistoriador = getParametro("nome_vistoriador");
             $pneusNaoEstaoDesgastados = getParametro("pneus_nao_estao_desgastados");
@@ -129,6 +134,8 @@ class VistoriaVeicularServico extends ServicoBase {
             $this->vistoriaVeicularRepositorio->cadastrarVistoriaVeicular($vistoriaVeicular);
 
             Resposta::response(true, "Vistoria finalizada com sucesso.", $vistoriaVeicular);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se cadastrar a vistoria veicular." . $e->getMessage());
         }
@@ -165,6 +172,7 @@ class VistoriaVeicularServico extends ServicoBase {
     public function buscarVistoriaVeicularPeloId() {
 
         try {
+            $this->authServico->validar();
 
             if (!isset($_GET["vistoria_id"])) {
                 Resposta::response(false, "Informe o id da vistoria na url.");
@@ -183,6 +191,8 @@ class VistoriaVeicularServico extends ServicoBase {
             }
 
             Resposta::response(true, "Vistoria encontrada com sucesso.", $vistoria);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se buscar a vistoria veicular pelo id." . $e->getMessage());
         }

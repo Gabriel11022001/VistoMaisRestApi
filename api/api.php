@@ -1,6 +1,7 @@
 <?php
 
 use Controllers\CategoriaVeiculoController;
+use Controllers\LoginController;
 use Controllers\ProprietarioController;
 use Controllers\Rota;
 use Controllers\UsuarioController;
@@ -15,6 +16,16 @@ require_once __DIR__ . "/../src/Utils/getParametro.php";
 try {   
     $rota = new Rota();
     $endpoint = $rota->getRotaAtual();
+
+    // realizar login
+    if ($endpoint === "/login") {
+        $rota->post("/login", LoginController::class, "login");
+    }
+
+    // efetuar logout
+    if ($endpoint === "/logout") {
+        $rota->post("/logout", LoginController::class, "logout");
+    }
 
     // cadastrar categoria de veiculo
     if ($endpoint === "/categorias-veiculo/cadastrar") {

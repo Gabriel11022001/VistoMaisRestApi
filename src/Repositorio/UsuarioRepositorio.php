@@ -33,7 +33,7 @@ class UsuarioRepositorio extends Repositorio implements IUsuarioRepositorio {
 
     // editar usuário
     public function editarUsuario($usuarioEditar) {
-        $stmt = $this->bancoDados->prepare("UPDATE tb_usuarios SET nome_completo = :^nome_completo, login = :login,
+        $stmt = $this->bancoDados->prepare("UPDATE tb_usuarios SET nome_completo = :nome_completo, login = :login,
         senha = :senha WHERE usuario_id = :usuario_id");
 
         $stmt->bindValue(":usuario_id", $usuarioEditar->usuarioId);
@@ -58,11 +58,8 @@ class UsuarioRepositorio extends Repositorio implements IUsuarioRepositorio {
 
     // buscar usuário pelo login e senha
     public function buscarUsuarioPeloLoginSenha($login, $senha) {
-        $stmt = $this->bancoDados->prepare("SELECT u.*, tk.token_id, tk.token FROM tb_usuarios u 
-        INNER JOIN tb_tokens tk
-        ON u.usuario_id = tk.usuario_id
-        AND u.login = :login
-        AND u.senha = :senha");
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_usuarios 
+        WHERE login = :login AND senha = :senha");
 
         $stmt->bindValue(":login", $login);
         $stmt->bindValue(":senha", $senha);
@@ -82,24 +79,34 @@ class UsuarioRepositorio extends Repositorio implements IUsuarioRepositorio {
         $usuario->senha = $usuarioObj->senha;
 
         $token = new Token();
-        $token->tokenId = $usuarioObj->token_id;
-        $token->token = $usuarioObj->token;
+        
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_tokens WHERE usuario_id = :usuario_id");
+        $stmt->bindValue(":usuario_id", $usuario->usuarioId);
+        $stmt->execute();
+        $tokenObj = $stmt->fetchObject();
 
-        $usuario->token = $token;
+        if (empty($tokenObj)) {
+            $usuario->token = null;
+        } else {
+            $token = new Token();
+            $token->tokenId = $tokenObj->token_id;
+            $token->token = $tokenObj->token;
+            $token->dataCadastro = $tokenObj->data_cadastro;
+            $token->dataLimite = $tokenObj->data_limite;
+
+            $usuario->token = $token;
+        }
 
         return $usuario;
     }
 
     // buscar usuário pelo login
     public function buscarUsuarioPeloLogin($login) {
-        $stmt = $this->bancoDados->prepare("SELECT u.*, tk.token_id, tk.token FROM tb_usuarios u 
-        INNER JOIN tb_tokens tk
-        ON u.usuario_id = tk.usuario_id
-        AND u.login = :login");
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_usuarios 
+        WHERE login = :login");
 
         $stmt->bindValue(":login", $login);
         $stmt->execute();
-
         $usuarioObj = $stmt->fetchObject();
 
         if (empty($usuarioObj)) {
@@ -115,10 +122,66 @@ class UsuarioRepositorio extends Repositorio implements IUsuarioRepositorio {
         $usuario->senha = $usuarioObj->senha;
 
         $token = new Token();
-        $token->tokenId = $usuarioObj->token_id;
-        $token->token = $usuarioObj->token;
+        
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_tokens WHERE usuario_id = :usuario_id");
+        $stmt->bindValue(":usuario_id", $usuario->usuarioId);
+        $stmt->execute();
+        $tokenObj = $stmt->fetchObject();
 
-        $usuario->token = $token;
+        if (empty($tokenObj)) {
+            $usuario->token = null;
+        } else {
+            $token = new Token();
+            $token->tokenId = $tokenObj->token_id;
+            $token->token = $tokenObj->token;
+            $token->dataCadastro = $tokenObj->data_cadastro;
+            $token->dataLimite = $tokenObj->data_limite;
+
+            $usuario->token = $token;
+        }
+
+        return $usuario;
+    }
+
+    // buscar usuário pelo id
+    public function buscarUsuarioPeloId($idUsuario) {
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_usuarios 
+        WHERE usuario_id = :usuario_id");
+
+        $stmt->bindValue(":usuario_id", $idUsuario);
+        $stmt->execute();
+        $usuarioObj = $stmt->fetchObject();
+
+        if (empty($usuarioObj)) {
+
+            return null;
+        }
+
+        $usuario = new Usuario();
+
+        $usuario->usuarioId = $usuarioObj->usuario_id;
+        $usuario->nomeCompleto = $usuarioObj->nome_completo;
+        $usuario->login = $usuarioObj->login;
+        $usuario->senha = $usuarioObj->senha;
+
+        $token = new Token();
+        
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_tokens WHERE usuario_id = :usuario_id");
+        $stmt->bindValue(":usuario_id", $usuario->usuarioId);
+        $stmt->execute();
+        $tokenObj = $stmt->fetchObject();
+
+        if (empty($tokenObj)) {
+            $usuario->token = null;
+        } else {
+            $token = new Token();
+            $token->tokenId = $tokenObj->token_id;
+            $token->token = $tokenObj->token;
+            $token->dataCadastro = $tokenObj->data_cadastro;
+            $token->dataLimite = $tokenObj->data_limite;
+
+            $usuario->token = $token;
+        }
 
         return $usuario;
     }

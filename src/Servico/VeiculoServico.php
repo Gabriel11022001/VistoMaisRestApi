@@ -9,6 +9,7 @@ use Repositorio\CategoriaVeiculoRepositorio;
 use Repositorio\ProprietarioRepositorio;
 use Repositorio\VeiculoRepositorio;
 use Utils\Resposta;
+use Utils\TokenInvalidoException;
 use Validators\ValidaCamposCadastroVeiculo;
 
 class VeiculoServico extends ServicoBase {
@@ -16,11 +17,13 @@ class VeiculoServico extends ServicoBase {
     private $veiculoRepositorio;
     private $propritarioRepositorio;
     private $categoriaVeiculoRepositorio;
+    private $authServico;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->authServico = new AuthServico();
         $this->veiculoRepositorio = new VeiculoRepositorio($this->bancoDados);
         $this->propritarioRepositorio = new ProprietarioRepositorio($this->bancoDados);
         $this->categoriaVeiculoRepositorio = new CategoriaVeiculoRepositorio($this->bancoDados);
@@ -30,6 +33,8 @@ class VeiculoServico extends ServicoBase {
     public function cadastrarVeiculo() {
         
         try {
+            $this->authServico->validar();
+
             $marca = getParametro("marca");
             $modelo = getParametro("modelo");
             $anoFabricacao = getParametro("ano_fabricacao");
@@ -102,6 +107,8 @@ class VeiculoServico extends ServicoBase {
             $veiculoCadastrar->categoriaVeiculo = $categoriaVeiculo;
 
             Resposta::response(true, "Veiculo cadastrado com sucesso.", $veiculoCadastrar);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se cadastrar o veículo." . $e->getMessage());
         }   
@@ -112,7 +119,8 @@ class VeiculoServico extends ServicoBase {
     public function buscarVeiculos() {
 
         try {
-            
+            $this->authServico->validar();
+
             if (!isset($_GET["pagina_atual"]) || !isset($_GET["elementos_por_pagina"])) {
                 Resposta::response(false, "Informe a pagina atual e a quantidade de elementos por página na url.");
             }
@@ -131,6 +139,8 @@ class VeiculoServico extends ServicoBase {
             }
 
             Resposta::response(true, "Veiculos listados com sucesso.", $veiculos);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se buscar os veiculos.");
         }
@@ -141,7 +151,8 @@ class VeiculoServico extends ServicoBase {
     public function buscarVeiculoPeloId() {
 
        try {
-        
+            $this->authServico->validar();
+
             if (!isset($_GET["veiculo_id"])) {
                 Resposta::response(false, "Informe o id do veiculo na url.");
             }
@@ -159,6 +170,8 @@ class VeiculoServico extends ServicoBase {
             }
 
             Resposta::response(true, "Veiculo encontrado com sucesso.", $veiculo);
+       } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
        } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se buscar o veiculo pelo id.");
        }

@@ -6,15 +6,18 @@ use Exception;
 use Models\Usuario;
 use Repositorio\UsuarioRepositorio;
 use Utils\Resposta;
+use Utils\TokenInvalidoException;
 
 class UsuarioServico extends ServicoBase {
 
     private $usuarioRepositorio;
+    private $authServico;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->authServico = new AuthServico();
         $this->usuarioRepositorio = new UsuarioRepositorio($this->bancoDados);
     }
 
@@ -22,6 +25,8 @@ class UsuarioServico extends ServicoBase {
     public function cadastrarUsuario() {
 
         try {   
+            $this->authServico->validar();
+
             $nomeCompleto = getParametro("nome_completo");
             $login = getParametro("login");
             $senha = getParametro("senha");
@@ -58,6 +63,8 @@ class UsuarioServico extends ServicoBase {
             $this->usuarioRepositorio->cadastrarUsuario($usuarioCadastrar);
 
             Resposta::response(true, "Usuário cadastrado com sucesso.", $usuarioCadastrar);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se cadastrar o usuário.");
         }

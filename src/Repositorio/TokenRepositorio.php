@@ -20,7 +20,7 @@ class TokenRepositorio extends Repositorio {
         $stmt->bindValue(":token", $tokenUsuarioCadastrar->token);
         $stmt->bindValue(":data_cadastro", $tokenUsuarioCadastrar->dataCadastro);
         $stmt->bindValue(":data_limite", $tokenUsuarioCadastrar->dataLimite);
-        $stmt->bindValue(":usuario_id", $tokenUsuarioCadastrar->usuario_id);
+        $stmt->bindValue(":usuario_id", $tokenUsuarioCadastrar->usuarioId);
 
         if (!$stmt->execute()) {
 
@@ -40,6 +40,15 @@ class TokenRepositorio extends Repositorio {
             throw new Exception("Erro ao tentar-se deletar os tokens do usuário.");
         }
 
+    }
+
+    // buscar token do usuário
+    public function buscarTokenUsuario($token) {
+        $stmt = $this->bancoDados->prepare("SELECT * FROM tb_tokens WHERE token = :token");
+        $stmt->bindValue(":token", $token);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
 }
