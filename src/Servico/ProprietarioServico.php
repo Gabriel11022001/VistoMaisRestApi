@@ -8,18 +8,21 @@ use Models\Endereco;
 use Models\Proprietario;
 use Repositorio\ProprietarioRepositorio;
 use Utils\Resposta;
+use Utils\TokenInvalidoException;
 use Validators\ValidaCamposCadastroProprietario;
 use Validators\ValidaCpf;
 
 class ProprietarioServico extends ServicoBase {
 
     private $proprietarioRepositorio;
+    private $authServico;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->proprietarioRepositorio = new ProprietarioRepositorio($this->bancoDados);
+        $this->authServico = new AuthServico();
     }
 
     // cadastrar proprietário na base de dados
@@ -27,6 +30,8 @@ class ProprietarioServico extends ServicoBase {
         $this->bancoDados->beginTransaction();
 
         try {
+            $this->authServico->validar();
+
             $nomeCompleto =   getParametro("nome_completo");
             $cpf =            getParametro("cpf");
             $rg =             getParametro("rg");
@@ -105,6 +110,10 @@ class ProprietarioServico extends ServicoBase {
             $proprietarioCadastrar->endereco = $endereco;
 
             Resposta::response(true, "Proprietário cadastrado com sucesso.", $proprietarioCadastrar);
+        } catch (TokenInvalidoException) {
+            $this->bancoDados->rollBack();
+
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             $this->bancoDados->rollBack();
 
@@ -117,7 +126,8 @@ class ProprietarioServico extends ServicoBase {
     public function buscarProprietarios() {
 
         try {
-            
+            $this->authServico->validar();
+
             if (!isset($_GET["pagina_atual"]) || !isset($_GET["elementos_por_pagina"])) {
                 Resposta::response(false, "Informe a pagina atual e a quantidade de elementos por página na url.");
             }
@@ -141,6 +151,8 @@ class ProprietarioServico extends ServicoBase {
                 Resposta::response(true, "Não existem proprietários cadastrados na base de dados.", array());
             }
 
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se consultar os proprietários.", $e->getMessage());
         }
@@ -151,6 +163,8 @@ class ProprietarioServico extends ServicoBase {
     public function buscarProprietarioPeloCpf() {
 
         try {
+            $this->authServico->validar();
+
             $cpf = getParametro("cpf");
 
             if (empty($cpf)) {
@@ -169,6 +183,8 @@ class ProprietarioServico extends ServicoBase {
             }
 
             Resposta::response(true, "Proprietáiro encontrado com sucesso.", $proprietario);
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se consultar o proprietário pelo cpf.");
         }
@@ -179,7 +195,8 @@ class ProprietarioServico extends ServicoBase {
     public function buscarProprietarioPeloId() {
 
         try {
-            
+            $this->authServico->validar();
+
             if (!isset($_GET["proprietario_id"])) {
                 Resposta::response(false, "Informe o id do proprietário na url.");
             }
@@ -197,6 +214,8 @@ class ProprietarioServico extends ServicoBase {
             }
 
             Resposta::response(false, "Não existe um proprietário cadastrado na base de dados com o id informado.");
+        } catch (TokenInvalidoException) {
+            Resposta::response(false, "Você não está autenticado.");
         } catch (Exception $e) {
             Resposta::response(false, "Erro ao tentar-se buscar o proprietario pelo id.");
         }
