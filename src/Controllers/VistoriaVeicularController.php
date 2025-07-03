@@ -25,4 +25,16 @@ class VistoriaVeicularController {
         return $this->vistoriaVeicularServico->buscarVistoriaVeicularPeloId();
     }
 
+    // buscar vistorias veiculares
+    public function buscarVistoriasVeiculares() {
+
+        return $this->vistoriaVeicularServico->buscarVistoriasVeiculares();
+    }
+
+    // deletar vistoria veicular
+    public function deletarVistoriaVeicular() {
+
+        return $this->vistoriaVeicularServico->deletarVistoriaVeicular();
+    }
+
 }

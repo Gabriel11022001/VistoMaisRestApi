@@ -199,4 +199,60 @@ class VistoriaVeicularServico extends ServicoBase {
 
     }
 
+    // buscar vistorias veiculares
+    public function buscarVistoriasVeiculares() {
+
+        try {
+            $this->authServico->validar();
+
+            if (!isset($_GET["pagina_atual"]) || !isset($_GET["elementos_por_pagina"])) {
+                Resposta::response(false, "Informe a pagina atual e a quantidade de elementos na url da página.");
+            }
+
+            $paginaAtual = $_GET["pagina_atual"];
+            $elementosPorPagina = $_GET["elementos_por_pagina"];
+
+            $vistorias = $this->vistoriaVeicularRepositorio->buscarVistoriasVeiculares($paginaAtual, $elementosPorPagina);
+
+            if (count($vistorias) == 0) {
+                Resposta::response(true, "Não existem vistorias cadastradas.", []);
+            }
+
+            Resposta::response(true, "Vistorias listadas com sucesso.", $vistorias);
+        } catch (TokenInvalidoException $e) {
+            Resposta::response(false, "Você não está autenticado.");
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se consultar as vistorias veiculares.");
+        }
+
+    }
+
+    // deletar vistoria veicular
+    public function deletarVistoriaVeicular() {
+        
+        try {
+            $this->authServico->validar();
+
+            if (!isset($_GET["id_vistoria_veicular"])) {
+                Resposta::response(false, "Informe o id da vistoria veicular que você deseja deletar.");
+            }
+
+            $idVistoriaDeletar = $_GET["id_vistoria_veicular"];
+
+            // validar se a vistoria existe na base de dados
+            if (empty($this->vistoriaVeicularRepositorio-> buscarVistoriaVeicularPeloId($idVistoriaDeletar))) {
+                Resposta::response(false, "Não existe uma vistoria cadastrada com esse id na base de dados.");
+            }
+
+            $this->vistoriaVeicularRepositorio->deletarVistoriaVeicular($idVistoriaDeletar);
+
+            Resposta::response(true, "Vistoria veicular deletada com sucesso.");
+        } catch (TokenInvalidoException $e) {
+            Resposta::response(false, "Você não está autenticado.");
+        } catch (Exception $e) {
+            Resposta::response(false, "Erro ao tentar-se deletar a vistoria veicular.");
+        }
+
+    }
+
 }

@@ -97,6 +97,16 @@ try {
         $rota->post("/usuarios/cadastrar", UsuarioController::class, "cadastrarUsuario");
     }
 
+    // buscar todas as vistorias veiculares
+    if ($endpoint === "/vistorias/veicular") {
+        $rota->get("/vistorias/veicular", VistoriaVeicularController::class, "buscarVistoriasVeiculares");
+    }
+
+    // deletar vistoria veicular
+    if ($endpoint === "/vistorias/veicular/deletar") {
+        $rota->delete("/vistorias/veicular/deletar", VistoriaVeicularController::class, "deletarVistoriaVeicular");
+    }
+
     Resposta::response(false, "404 - Rota inválida.");
 } catch (Exception $e) {
     echo "Erro: " . $e->getMessage() . "<br>";
